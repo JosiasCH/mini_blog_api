@@ -1,0 +1,26 @@
+[project]
+name = "mini-blog-api"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Your Name",email = "you@example.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi (>=0.119.0,<0.120.0)",
+    "uvicorn[standard] (>=0.37.0,<0.38.0)",
+    "sqlalchemy[asyncio] (>=2.0.44,<3.0.0)",
+    "asyncpg (>=0.30.0,<0.31.0)",
+    "pydantic (>=2.12.2,<3.0.0)",
+    "pydantic-settings (>=2.11.0,<3.0.0)",
+    "python-multipart (>=0.0.20,<0.0.21)",
+    "passlib[bcrypt] (>=1.7.4,<2.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "mini_blog_api", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
