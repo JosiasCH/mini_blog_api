@@ -90,3 +90,58 @@ Claves foráneas:
 ```bash
 git clone https://github.com/JosiasCH/mini_blog_api.git
 cd mini_blog_api
+
+
+2️⃣ Crear entorno con Poetry
+poetry install
+
+
+3️⃣ Configurar variables de entorno
+
+Crea un archivo .env basado en .env.example:
+
+DATABASE_URL=postgresql+asyncpg://postgres:tu_password@localhost:5432/mini_blog
+
+
+4️⃣ Ejecutar migraciones (opcional, si se agrega Alembic)
+poetry run alembic upgrade head
+
+
+5️⃣ Levantar el servidor
+poetry run uvicorn mini_blog_api.main:app --reload --app-dir src
+
+
+
+Servidor disponible en:
+👉 http://127.0.0.1:8000
+
+Documentación interactiva Swagger:
+👉 http://127.0.0.1:8000/docs
+
+
+
+🌱 Flujo de ramas (Git Flow)
+Rama	Propósito
+main	Producción estable (releases)
+develop	Integración de nuevas features
+docs/fase1-erd	Modelado y documentación (Fase 1)
+feat/fase2-api	Implementación del backend (Fase 2)
+
+
+🧾 Licencia
+
+Este proyecto se distribuye bajo la licencia MIT.
+Eres libre de usarlo, modificarlo y distribuirlo, siempre que se mantengan los créditos correspondientes.
+
+
+✨ Autor
+
+Josias CH
+Desarrollador Python | Data Scientist | Backend Developer
+📧 20210614@aloe.ulima.edu.pe
+
+🔗 GitHub - JosiasCH
+
+---
+
+

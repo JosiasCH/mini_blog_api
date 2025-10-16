@@ -13,3 +13,8 @@ async def on_startup():
 app.include_router(users.router)
 app.include_router(posts.router)
 app.include_router(comments.router)
+
+
+@app.get("/")
+def root():
+    return {"status": "ok"}
