@@ -1,46 +1,52 @@
-from pydantic import BaseModel, EmailStr, Field
-from datetime import datetime
-from typing import List
+from __future__ import annotations
 
+from datetime import datetime
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
+# -------- Users --------
 class UserCreate(BaseModel):
-    username: str = Field(..., max_length=30)
+    username: str
     email: EmailStr
-    password: str = Field(..., min_length=6)
+    password: str
+
 
 class UserOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     username: str
     email: EmailStr
     created_at: datetime
-    class Config:
-        from_attributes = True
 
-class PostCreate(BaseModel):
-    title: str = Field(..., max_length=200)
-    content: str
-    author_id: int
 
-class PostOut(BaseModel):
-    id: int
-    title: str
-    content: str
-    created_at: datetime
-    author_id: int
-    class Config:
-        from_attributes = True
-
+# -------- Comments --------
 class CommentCreate(BaseModel):
     text: str
     author_id: int
 
+
 class CommentOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     text: str
-    created_at: datetime
     author_id: int
-    post_id: int
-    class Config:
-        from_attributes = True
+    created_at: datetime
 
-class PostWithComments(PostOut):
-    comments: List[CommentOut] = []
+
+# -------- Posts --------
+class PostCreate(BaseModel):
+    title: str
+    content: str
+    author_id: int
+
+
+class PostOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    title: str
+    content: str
+    author_id: int
+    created_at: datetime
+    comments: list[CommentOut] = Field(default_factory=list)

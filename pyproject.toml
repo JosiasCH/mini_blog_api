@@ -16,7 +16,8 @@ dependencies = [
     "pydantic-settings (>=2.11.0,<3.0.0)",
     "python-multipart (>=0.0.20,<0.0.21)",
     "passlib (==1.7.4)",
-    "bcrypt (==3.2.2)"
+    "bcrypt (==3.2.2)",
+    "alembic (>=1.17.0,<2.0.0)"
 ]
 
 [tool.poetry]
@@ -33,3 +34,15 @@ packages = [{ include = "mini_blog_api", from = "src" }]
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=8.4.2,<9.0.0)",
+    "pytest-asyncio (>=1.2.0,<2.0.0)",
+    "httpx (>=0.28.1,<0.29.0)",
+    "asgi-lifespan (>=2.1.0,<3.0.0)"
+]
+
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
