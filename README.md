@@ -84,6 +84,8 @@ Claves foráneas:
 
 ---
 
+
+
 ## ⚙️ Instalación y Configuración
 
 ### 1️⃣ Clonar el repositorio
@@ -143,5 +145,22 @@ Desarrollador Python | Data Scientist | Backend Developer
 🔗 GitHub - JosiasCH
 
 ---
+
+
+### Ejecutar con Docker / Docker Compose
+
+```bash
+# 1) Levantar stack (DB + API)
+docker compose up --build
+
+# 2) API disponible
+# Swagger: http://localhost:8000/docs
+
+
+# Aplicar migraciones manualmente dentro del contenedor
+docker compose exec api poetry run alembic upgrade head
+
+# Correr tests (opcional, requiere una DB de test si los apuntas a Docker)
+docker compose exec api poetry run pytest -q
 
 
