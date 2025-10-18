@@ -15,6 +15,57 @@
   <img src="https://img.shields.io/badge/Poetry-60A5FA?style=for-the-badge&logo=poetry&logoColor=white"/>
 </p>
 
+---
+
+## ⚡ Requisitos Previos
+
+Antes de iniciar el proyecto, asegúrate de tener instaladas las siguientes herramientas:
+
+| Herramienta | Versión mínima | Comando de verificación | Descripción |
+|--------------|----------------|--------------------------|--------------|
+| **Python** | 3.10+ | `python --version` | Lenguaje base del proyecto. Necesario si se ejecuta localmente con Poetry. |
+| **Poetry** | 2.0+ | `poetry --version` | Gestión de dependencias, entorno virtual y scripts de ejecución. |
+| **Docker** | 24.0+ | `docker --version` | Contenerización de la aplicación y su entorno. |
+| **Docker Compose** | 2.17+ | `docker compose version` | Orquestación de contenedores (API + Base de Datos). |
+| **PostgreSQL** | 14+ | `psql --version` | Motor de base de datos utilizado por la API. No requerido si se usa Docker. |
+| **Git** | 2.30+ | `git --version` | Clonación y control de versiones del repositorio. |
+| **cURL** | 7.0+ | `curl --version` | Pruebas rápidas de endpoints REST desde la terminal. |
+| **VS Code / PyCharm** *(recomendado)* | — | — | Editor recomendado con soporte para Python, FastAPI y Docker. |
+
+---
+
+💡 **Notas importantes:**
+
+- Si usas **Docker Compose**, no necesitas instalar **PostgreSQL** localmente; el contenedor `db` lo crea y configura automáticamente.  
+- En entornos **Windows**, se recomienda habilitar **WSL2** para un mejor rendimiento con Docker y Poetry.  
+- Si usas **cURL** en PowerShell, utiliza acentos graves (\`) para separar líneas largas en los ejemplos de comandos.  
+- Para probar los endpoints también puedes usar **Postman** o **Bruno** (clientes REST GUI opcionales).  
+
+
+## 🚀 Ejecución rápida
+
+### Local (Poetry)
+```bash
+cp envs/.env.example .env
+poetry install
+poetry run alembic upgrade head
+poetry run uvicorn src.mini_blog_api.main:app --reload
+```
+
+## Docker
+```bash
+cp envs/.env.docker.example .env.docker
+docker compose up -d --build
+```
+
+## ✅ Verificación del entorno
+```bash
+python --version
+poetry --version
+docker compose version
+psql --version            # solo si no usas Docker
+poetry check && poetry run pytest -q
+```
 
 ## 📚 Índice
 
@@ -367,6 +418,34 @@ curl -s -X POST http://localhost:8000/posts/1/comments/ `
   -d "{\"text\":\"Buen post!\",\"author_id\":1}"
 
 # Listar comentarios de un post
+curl -s http://localhost:8000/posts/1/comments/
+```
+
+### 🧪 cURL de Ejemplo (Windows CMD)
+
+```cmd
+:: Crear usuario
+curl -s -X POST http://localhost:8000/users/ ^
+  -H "Content-Type: application/json" ^
+  -d "{\"username\":\"carl\",\"email\":\"carl@example.com\",\"password\":\"secret123\"}"
+
+:: Crear post
+curl -s -X POST http://localhost:8000/posts/ ^
+  -H "Content-Type: application/json" ^
+  -d "{\"title\":\"Hola\",\"content\":\"Mundo\",\"author_id\":1}"
+
+:: Listar posts
+curl -s http://localhost:8000/posts/?limit=5
+
+:: Obtener post por ID
+curl -s http://localhost:8000/posts/1
+
+:: Agregar comentario
+curl -s -X POST http://localhost:8000/posts/1/comments/ ^
+  -H "Content-Type: application/json" ^
+  -d "{\"text\":\"Buen post!\",\"author_id\":1}"
+
+:: Listar comentarios de un post
 curl -s http://localhost:8000/posts/1/comments/
 ```
 
