@@ -1,166 +1,101 @@
-## Diagrama de Base de Datos
-![ERD Mini-Blog](docs/Mini-Blog-DB.png)
+# 📝 Mini Blog API
 
+**API REST asíncrona** construida con **FastAPI**, **SQLAlchemy 2.0 (Async)**, **PostgreSQL**, Alembic, Pytest y Poetry.
 
-# 📝 Mini Blog API  
-![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-green.svg)
-![Poetry](https://img.shields.io/badge/Poetry-managed-orange.svg)
-![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)
-
-API REST construida con **FastAPI** y **PostgreSQL**, diseñada para gestionar usuarios, publicaciones y comentarios.  
-Este proyecto forma parte de una **prueba técnica de desarrollador Python**, demostrando un flujo completo desde el modelado de base de datos hasta la implementación del backend con buenas prácticas de desarrollo, control de versiones y documentación.
+Este proyecto fue diseñado para la Prueba Técnica Integral de Sintad S.A.C., con un enfoque riguroso en la **calidad del código**, el **testeo**, las **migraciones de base de datos** y la **contenerización vía Docker**.
 
 ---
 
-## 🧩 Estructura del Proyecto
+## 📚 Índice
 
-mini_blog_api/
-│
-├── docs/ # Documentación y diagramas (ERD)
-│ └── Mini-Blog-DB.png
-│
-├── src/
-│ └── mini_blog_api/
-│ ├── core/ # Configuración, base de datos, variables de entorno
-│ ├── models/ # Modelos SQLAlchemy
-│ ├── schemas/ # Validaciones Pydantic
-│ ├── routers/ # Endpoints de API
-│ └── main.py # Punto de entrada FastAPI
-│
-├── tests/ # Carpeta reservada para pruebas unitarias
-│
-├── .env.example # Ejemplo de variables de entorno
-├── .gitignore
-├── pyproject.toml # Gestión de dependencias con Poetry
-├── poetry.lock
-└── README.md
-
+- [🧩 Fase 1 – Diseño y Modelado de la Base de Datos](#fase-1--diseño-y-modelado-de-la-base-de-datos)
+- [🌸 Fase 2 – Configuración y Desarrollo del Backend](#fase-2--configuración-y-desarrollo-del-backend)
+- [🧪 Fase 3 – Calidad de Código y Pruebas](#fase-3--calidad-de-código-y-pruebas)
+- [🐳 Fase 4 – Documentación y Despliegue](#fase-4--documentación-y-despliegue)
+- [🤖 Fase 5 – Prompt para Asistente de IA](#fase-5--prompt-para-asistente-de-ia)
+- [📜 Autoría](#autoría)
 
 ---
 
-## 🧠 Fases del Proyecto
+## 🧩 Fase 1 – Diseño y Modelado de la Base de Datos
 
-### **Fase 1 — Diseño y Modelado de Base de Datos**
-Se diseñó el modelo relacional con tres entidades principales:
+### 🧠 Descripción general
 
-- **users** → almacena datos de los usuarios  
-- **posts** → publicaciones creadas por los usuarios  
-- **comments** → comentarios asociados a publicaciones
+La base de datos utiliza **PostgreSQL** y sigue el estándar de la **Tercera Forma Normal (3NF)**, con integridad referencial estricta entre `users`, `posts` y `comments`.
 
-📄 **Archivo:** [`docs/Mini-Blog-DB.png`](docs/Mini-Blog-DB.png)
+### 🗺️ Diagrama Entidad-Relación (ERD)
 
-Relaciones principales:
-- 1 usuario → *N* publicaciones  
-- 1 usuario → *N* comentarios  
-- 1 publicación → *N* comentarios  
+<p align="center">
+  <img src="docs/Mini-Blog-DB.png" alt="Mini Blog ERD" width="720">
+</p>
 
-Claves foráneas:
-- `posts.author_id → users.id [ON DELETE RESTRICT]`
-- `comments.author_id → users.id [ON DELETE RESTRICT]`
-- `comments.post_id → posts.id [ON DELETE CASCADE]`
+### ⚙️ Elección de la Base de Datos (PostgreSQL)
 
----
+Se eligió **PostgreSQL** por su **robustez ACID**, soporte para tipos de datos avanzados y su excelente integración nativa con **SQLAlchemy Async** y **Alembic**.
 
-### **Fase 2 — Backend con FastAPI y SQLAlchemy**
+### 🧾 Estructura de Tablas
 
-#### Tecnologías principales
-- **FastAPI** → framework backend asincrónico  
-- **SQLAlchemy (async)** → ORM para PostgreSQL  
-- **Pydantic** → validación y serialización de datos  
-- **Poetry** → gestión de dependencias  
-- **Uvicorn** → servidor ASGI  
-
-#### Endpoints implementados
-
-| Módulo | Método | Endpoint | Descripción |
-|--------|---------|-----------|--------------|
-| Usuarios | `POST` | `/users/` | Crear un nuevo usuario |
-| Usuarios | `GET` | `/users/{user_id}` | Obtener detalles de un usuario |
-| Publicaciones | `POST` | `/posts/` | Crear nueva publicación |
-| Publicaciones | `GET` | `/posts/` | Listar las últimas publicaciones |
-| Publicaciones | `GET` | `/posts/{post_id}` | Obtener una publicación con sus comentarios |
-| Comentarios | `POST` | `/posts/{post_id}/comments` | Añadir comentario a una publicación |
+| Tabla | Campo | Tipo | Restricciones |
+| :--- | :--- | :--- | :--- |
+| **users** | `id` | `BIGSERIAL` | **PK** |
+| | `username` | `VARCHAR(30)` | **UNIQUE**, **NOT NULL** |
+| | `email` | `VARCHAR(254)` | **UNIQUE**, **NOT NULL** |
+| | `password_hash` | `TEXT` | **NOT NULL** |
+| | `created_at` | `TIMESTAMPTZ` | `DEFAULT now()`, **NOT NULL** |
+| **posts** | `id` | `BIGSERIAL` | **PK** |
+| | `title` | `VARCHAR(200)` | **NOT NULL** |
+| | `content` | `TEXT` | **NOT NULL** |
+| | `author_id` | `BIGINT` | **FK** → `users.id` (**ON DELETE RESTRICT**) |
+| | `created_at` | `TIMESTAMPTZ` | `DEFAULT now()`, **NOT NULL** |
+| **comments** | `id` | `BIGSERIAL` | **PK** |
+| | `text` | `TEXT` | **NOT NULL** |
+| | `post_id` | `BIGINT` | **FK** → `posts.id` (**ON DELETE CASCADE**) |
+| | `author_id` | `BIGINT` | **FK** → `users.id` (**ON DELETE RESTRICT**) |
+| | `created_at` | `TIMESTAMPTZ` | `DEFAULT now()`, **NOT NULL** |
 
 ---
 
+## 🌸 Fase 2 – Configuración y Desarrollo del Backend
 
+### 🧠 Descripción general
 
-## ⚙️ Instalación y Configuración
+Stack moderno asincrónico con FastAPI y SQLAlchemy Async. Arquitectura modular con **separación de responsabilidades** (SoC) entre las capas de *Routing*, *Services/Business Logic*, *Schemas* y *Models*.
 
-### 1️⃣ Clonar el repositorio
-```bash
-git clone https://github.com/JosiasCH/mini_blog_api.git
-cd mini_blog_api
+### ⚙️ Tecnologías principales
 
+Python 3.10 · **FastAPI** · **SQLAlchemy 2.0 (Async)** · **Pydantic v2** · Alembic · Poetry · Uvicorn
 
-2️⃣ Crear entorno con Poetry
-poetry install
-
-
-3️⃣ Configurar variables de entorno
-
-Crea un archivo .env basado en .env.example:
-
-DATABASE_URL=postgresql+asyncpg://postgres:tu_password@localhost:5432/mini_blog
-
-
-4️⃣ Ejecutar migraciones (opcional, si se agrega Alembic)
-poetry run alembic upgrade head
-
-
-5️⃣ Levantar el servidor
-poetry run uvicorn mini_blog_api.main:app --reload --app-dir src
-
-
-
-Servidor disponible en:
-👉 http://127.0.0.1:8000
-
-Documentación interactiva Swagger:
-👉 http://127.0.0.1:8000/docs
-
-
-
-🌱 Flujo de ramas (Git Flow)
-Rama	Propósito
-main	Producción estable (releases)
-develop	Integración de nuevas features
-docs/fase1-erd	Modelado y documentación (Fase 1)
-feat/fase2-api	Implementación del backend (Fase 2)
-
-
-🧾 Licencia
-
-Este proyecto se distribuye bajo la licencia MIT.
-Eres libre de usarlo, modificarlo y distribuirlo, siempre que se mantengan los créditos correspondientes.
-
-
-✨ Autor
-
-Josias CH
-Desarrollador Python | Data Scientist | Backend Developer
-📧 20210614@aloe.ulima.edu.pe
-
-🔗 GitHub - JosiasCH
-
----
-
-
-### Ejecutar con Docker / Docker Compose
+### 🗂️ Estructura del proyecto
 
 ```bash
-# 1) Levantar stack (DB + API)
-docker compose up --build
-
-# 2) API disponible
-# Swagger: http://localhost:8000/docs
-
-
-# Aplicar migraciones manualmente dentro del contenedor
-docker compose exec api poetry run alembic upgrade head
-
-# Correr tests (opcional, requiere una DB de test si los apuntas a Docker)
-docker compose exec api poetry run pytest -q
-
-
+.
+├── Dockerfile
+├── docker-compose.yml
+├── alembic.ini
+├── migrations/
+│   └── versions/
+├── envs/
+│   ├── .env.example
+│   └── .env.docker.example
+├── src/mini_blog_api/
+│   ├── main.py
+│   ├── core/                  # Configuración (database, settings)
+│   ├── models/                # Modelos SQLAlchemy ORM
+│   │   └── models.py
+│   ├── schemas/               # Modelos Pydantic
+│   │   ├── users.py
+│   │   ├── posts.py
+│   │   └── comments.py
+│   ├── services/            # Capa de Negocio / CRUD
+│   │   ├── users.py
+│   │   ├── posts.py
+│   │   └── comments.py
+│   └── routers/               # Definición de Endpoints HTTP
+│       ├── users.py
+│       ├── posts.py
+│       └── comments.py
+└── tests/                   # Pruebas de Integración
+    ├── conftest.py
+    ├── test_users.py
+    ├── test_posts.py
+    └── test_comments.py

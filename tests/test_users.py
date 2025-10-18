@@ -1,3 +1,4 @@
+# tests/test_users.py
 import pytest
 
 @pytest.mark.asyncio
@@ -20,15 +21,17 @@ async def test_create_user_and_get(client):
 @pytest.mark.asyncio
 async def test_create_user_conflict(client):
     # primer usuario OK
-    await client.post("/users/", json={
+    r1 = await client.post("/users/", json={
         "username": "bob",
         "email": "bob@mail.com",
         "password": "secret123"
     })
+    assert r1.status_code == 201
+
     # duplicado (username/email)
-    r = await client.post("/users/", json={
+    r2 = await client.post("/users/", json={
         "username": "bob",
         "email": "bob@mail.com",
         "password": "secret123"
     })
-    assert r.status_code in (409, 400)
+    assert r2.status_code == 409  # tu API devuelve 409 por IntegrityError

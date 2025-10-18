@@ -3,6 +3,7 @@ import os
 import pytest
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.pool import NullPool
+from sqlalchemy import text  # 👈 necesario para ejecutar SQL literal
 from httpx import AsyncClient, ASGITransport
 
 # --- Forzamos URL de test y desactivamos DDL en startup de la app ---
@@ -19,17 +20,15 @@ from mini_blog_api.core.database import Base, get_session
 
 @pytest.fixture(scope="session")
 def anyio_backend():
-    """
-    Usamos anyio/pytest-asyncio modo auto. Este fixture asegura backend compatible.
-    """
+    """Asegura backend asyncio para pytest-anyio/pytest-asyncio."""
     return "asyncio"
 
 
 @pytest.fixture(scope="session")
 async def engine():
     """
-    Engine de tests creado una vez por sesión. NullPool evita reusar conexiones
-    y mitiga 'another operation is in progress' en Windows.
+    Engine de tests creado una vez por sesión.
+    NullPool evita reusar conexiones (mitiga issues en Windows).
     """
     engine = create_async_engine(
         os.environ["DATABASE_URL"],
@@ -37,28 +36,30 @@ async def engine():
         poolclass=NullPool,
     )
     try:
+        # Crear todas las tablas una sola vez
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
         yield engine
     finally:
         await engine.dispose()
 
 
-@pytest.fixture(scope="session", autouse=True)
-async def setup_db(engine):
+@pytest.fixture(autouse=True)
+async def _db_clean(engine):
     """
-    Crea todas las tablas antes de los tests y las elimina al final.
+    Limpia la BD antes de CADA test para aislarlos:
+    TRUNCATE + RESTART IDENTITY + CASCADE.
     """
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.execute(
+            text("TRUNCATE TABLE comments, posts, users RESTART IDENTITY CASCADE;")
+        )
     yield
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
 
 
 @pytest.fixture
 async def session_factory(engine):
-    """
-    Fabrica de sesiones para inyectar en la app (una por request).
-    """
+    """Fábrica de sesiones para inyectar en la app (una por request)."""
     return async_sessionmaker(engine, expire_on_commit=False)
 
 
@@ -66,7 +67,7 @@ async def session_factory(engine):
 async def client(session_factory):
     """
     Cliente HTTP asíncrono con override de la dependencia get_session.
-    No usamos LifespanManager -> no ejecuta startup/shutdown.
+    Usamos ASGITransport (httpx moderno) y NO ejecutamos lifespan.
     """
     async def override_get_session():
         async with session_factory() as session:
@@ -74,7 +75,7 @@ async def client(session_factory):
 
     app.dependency_overrides[get_session] = override_get_session
 
-    transport = ASGITransport(app=app)  # httpx moderno (sin parámetro app en AsyncClient)
+    transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
 

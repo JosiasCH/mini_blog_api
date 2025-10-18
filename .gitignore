@@ -7,3 +7,29 @@ dist/
 .DS_Store
 .idea/
 .vscode/
+
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+*.db
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# Poetry
+poetry.lock
+
+
+__pycache__/
+*.pyc
+
+.env.docker

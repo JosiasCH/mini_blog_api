@@ -1,10 +1,11 @@
+# tests/test_posts.py
 import pytest
 
 @pytest.mark.asyncio
 async def test_list_and_get_post(client):
-    # crea usuario
+    # crea usuario y captura id
     u = await client.post("/users/", json={
-        "username":"carlos", "email":"carlos@mail.com", "password":"secret123"
+        "username": "carlos", "email":"carlos@mail.com", "password":"secret123"
     })
     assert u.status_code == 201
     uid = u.json()["id"]
@@ -14,7 +15,7 @@ async def test_list_and_get_post(client):
     assert r0.status_code == 200
     assert r0.json() == []
 
-    # crea post
+    # crea post y captura id
     p = await client.post("/posts/", json={
         "title":"Hola", "content":"Mundo", "author_id": uid
     })
@@ -34,11 +35,11 @@ async def test_list_and_get_post(client):
     assert data["comments"] == []
 
     # agrega comentario
-    c = await client.post(f"/posts/{pid}/comments", json={
+    c = await client.post(f"/posts/{pid}/comments/", json={
         "text": "¡Buen post!",
         "author_id": uid
     })
-    assert c.status_code in (201, 200)  # según tu implementación
+    assert c.status_code == 201  # tu router define 201
 
     # get by id con comentario
     r3 = await client.get(f"/posts/{pid}")
