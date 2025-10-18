@@ -20,12 +20,12 @@
 
 | Fase | Descripción |
 |------|--------------|
-| 🧩 [Fase 1 – Diseño y Modelado de la Base de Datos](#-fase-1--diseño-y-modelado-de-la-base-de-datos) |
-| 🌸 [Fase 2 – Configuración y Desarrollo del Backend](#-fase-2--configuración-y-desarrollo-del-backend) |
-| 🧪 [Fase 3 – Calidad de Código y Pruebas](#-fase-3--calidad-de-código-y-pruebas) |
-| 🐳 [Fase 4 – Documentación y Despliegue](#-fase-4--documentación-y-despliegue) |
-| 🤖 [Fase 5 – Prompt para Asistente de IA](#-fase-5--prompt-para-asistente-de-ia) |
-| 📜 [Autoría](#-autoría) |
+| 🧩 [Fase 1 – Diseño y Modelado de la Base de Datos](#-fase-1--diseño-y-modelado-de-la-base-de-datos) | Estructura, entidades y relaciones en PostgreSQL |
+| 🌸 [Fase 2 – Configuración y Desarrollo del Backend](#-fase-2--configuración-y-desarrollo-del-backend) | Implementación con FastAPI, SQLAlchemy y arquitectura modular |
+| 🧪 [Fase 3 – Calidad de Código y Pruebas](#-fase-3--calidad-de-código-y-pruebas) | Pruebas automatizadas con Pytest y validaciones asíncronas |
+| 🐳 [Fase 4 – Documentación y Despliegue](#-fase-4--documentación-y-despliegue) | Contenerización, migraciones y despliegue con Docker |
+| 🤖 [Fase 5 – Prompt para Asistente de IA](#-fase-5--prompt-para-asistente-de-ia) | Meta-prompt para asistentes de IA en el IDE |
+| 📜 [Autoría](#-autoría) | Información del autor y licencia |
 
 
 ## 🧩 Fase 1 – Diseño y Modelado de la Base de Datos
