@@ -276,8 +276,6 @@ alembic revision --autogenerate -m "init schema"
 
 # Aplicar migraciones
 alembic upgrade head
-python
-Copy code
 
 # migrations/env.py
 compare_type = True  # Detecta cambios de tipo en columnas
